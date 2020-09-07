@@ -8,6 +8,7 @@ Seu mau uso não é de minha responsabilidade.
 #include <Lmcons.h>
 #include <iostream>
 #include <dirent.h>
+#include <fstream>
 using namespace std;
 #pragma comment(lib,"libws2_32.a")
 void MalwareRun();
