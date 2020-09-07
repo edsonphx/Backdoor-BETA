@@ -87,13 +87,10 @@ string DeserializeJson(string parameter,string htmlResponse)
         && char_arrayHtmlResponse[i+1] == char_arrayParameter[1]
         && char_arrayHtmlResponse[i-1] == '"')
      {
-       if(char_arrayHtmlResponse[i+parameterLenght+3] = ' ')
+       initParameter = i+parameterLenght+3;
+       if(char_arrayHtmlResponse[initParameter] == ' ')
        {
          initParameter = i+parameterLenght+4;
-       }
-       else
-       {
-         initParameter = i+parameterLenght+3;
        }
        while(char_arrayHtmlResponse[initParameter] != '"')
        {
