@@ -9,7 +9,7 @@ Seu mau uso não é de minha responsabilidade.
 #include <iostream>
 #include <dirent.h>
 using namespace std;
-#pragma comment(lib,"ws2_32.lib")
+#pragma comment(lib,"libws2_32.a")
 void MalwareRun();
 string HttpGet(string url,string urlAction)
 {
