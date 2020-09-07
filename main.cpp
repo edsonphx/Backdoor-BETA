@@ -187,5 +187,5 @@ int main(int argc,char *argv[])
 {
     InitConfig(argv[0]);
     Malware();
-    return 0;
+    return 1;
 }
