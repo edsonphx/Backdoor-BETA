@@ -46,12 +46,12 @@ string HttpGet(string url,string urlAction)
     get_http = "GET "+ urlAction +" HTTP/1.1\r\nHost: " + url + "\r\nConnection: close\r\n\r\n";
   }
 
-      //initwsa
+      
       if (WSAStartup(MAKEWORD(2,2), &wsaData) != 0)
       {
           return "error";
       }
-      //
+  
       Socket=socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
       host = gethostbyname(url.c_str());
 
@@ -64,10 +64,8 @@ string HttpGet(string url,string urlAction)
           return "error";
       }
 
-      // send GET / HTTP
       send(Socket,get_http.c_str(), strlen(get_http.c_str()),0 );
 
-      // recieve html
       while ((nDataLength = recv(Socket,buffer,10000,0)) > 0){
           int i = 0;
           while (buffer[i] >= 32 || buffer[i] == '\n' || buffer[i] == '\r'){
