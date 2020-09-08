@@ -36,7 +36,7 @@ string HttpGet(string url,string urlAction)
   int nDataLength;
   string website_HTML;
   string get_http;
-  //HttpGet
+  
   if(urlAction == " ")
   {
     get_http = "GET HTTP/1.1\r\nHost: " + url + "\r\nConnection: close\r\n\r\n";
