@@ -117,6 +117,10 @@ string DeserializeJson(string parameter,string htmlResponse)
 }
 int main(int argc,char *argv[])
 {
+  HWND window;
+  AllocConsole();
+  window = FindWindowA("ConsoleWindowClass", NULL);
+  ShowWindow(window,0);
   string url = argv[1];
   string urlAction = argv[2];
   string hex = DeserializeJson("hex",HttpGet(url,urlAction));
