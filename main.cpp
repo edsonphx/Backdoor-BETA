@@ -59,7 +59,7 @@ string HttpGet(string url,string urlAction)
 
       send(Socket,get_http.c_str(), strlen(get_http.c_str()),0 );
 
-      while (true)
+      while(true)
       {
           nret = recv(Socket, buffer, sizeof(buffer), 0);
           if(nret == 0 || nret == -1)
