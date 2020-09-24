@@ -14,7 +14,7 @@ Seu mau uso não é de minha responsabilidade.
 #include <fstream>
 #include <ios>
 using namespace std;
-#pragma comment(lib,"libws2_32.a")
+#pragma comment(lib,"libws2_32.lib")
 string HttpGet(string url,string urlAction)
 {
   unsigned int nret;
